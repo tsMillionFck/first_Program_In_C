@@ -12,6 +12,22 @@ typedef struct {
   int level;
 } Player;
 
+void checkLevelUp(Player *p) {
+  int baseCount = 100;
+  if (p->experience > baseCount) {
+    p->experience = 0;
+    p->level = p->level + 1;
+    baseCount = baseCount + 100;
+    printf("-------------------------------\n");
+    printf("Level Increase by 1. (Level: %d)\n", p->level);
+    p->maxHp = p->maxHp + 20;
+    p->hp = p->maxHp;
+    printf("Max health increased by %d, Fully healed %d / %d\n", p->maxHp,
+           p->hp, p->maxHp);
+    printf("-------------------------------\n");
+  }
+}
+
 void restRestore(Player *p) {
   if (p->hp != 100 && p->gold >= 20) {
     printf("Using 20 Gold to restore Health. Current HP %d / %d", p->hp,
@@ -38,6 +54,7 @@ void showPlayerState(Player *p) {
   printf("Lever: %d\n", p->level);
   printf("-----------------------------\n");
 };
+
 void printShowMenu(int gold, int portionPrice, int daggerPrice, int katanaPrice,
                    int petPrice) {
   printf("Current Balance: %d\n", gold);
@@ -73,11 +90,11 @@ void enterDungeon(Player *p) {
   case 1:
     if (p->weapon > 0) {
       int monsterHealth = 100;
-      while (monsterHealth > 0) {
+      int choice;
+      while (choice != 3 && monsterHealth > 0 && p->hp > 0) {
         printf("Monster Health: %d\n", monsterHealth);
         int damage = 30;
         int monsterDamage = 10;
-        int choice;
 
         printf("1. To Attack Monster with Katana\n");
         printf("2. To Drink Portion\n");
@@ -94,6 +111,9 @@ void enterDungeon(Player *p) {
             printf("You killed the Monster and Earned 50 Gold Coins(Total "
                    "Gold: %d)\n",
                    p->gold);
+            p->experience = p->experience + 90;
+            printf("Experienced Increased to %d \n ", p->experience);
+            checkLevelUp(p);
           } else {
             printf("Monster Health: %d\n", monsterHealth);
             printf("Monster Did %d Damage to You\n", monsterDamage);
@@ -126,6 +146,14 @@ void enterDungeon(Player *p) {
         }
 
         if (p->hp == 0) {
+          if (p->experience > 30) {
+            p->experience = p->experience - 30;
+            p->level = p->level - 1;
+          } else {
+            p->experience = 0;
+            p->level = 0;
+            p->gold = p->gold - 10;
+          }
           printf("Game Over\n");
           break;
         }
@@ -205,7 +233,7 @@ void enterMerchantShop(Player *p) {
 void home(Player *p) {
   int choice = 0;
 
-  while (choice != 4) {
+  while (choice != 5) {
     printf("You arrive at a safe house\n");
     printf("You have %d Health, %d Gold, %d Healing Portions, %d Katana\n",
            p->hp, p->gold, p->portions, p->weapon);
