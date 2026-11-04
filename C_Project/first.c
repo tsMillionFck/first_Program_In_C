@@ -12,6 +12,15 @@ typedef struct {
   int level;
 } Player;
 
+typedef struct {
+  char name[30];
+  int hp;
+  int maxHp;
+  int attack;
+  int expReward;
+  int goldReward;
+} Monster;
+
 void checkLevelUp(Player *p) {
   int baseCount = 100;
   if (p->experience > baseCount) {
@@ -22,14 +31,14 @@ void checkLevelUp(Player *p) {
     printf("Level Increase by 1. (Level: %d)\n", p->level);
     p->maxHp = p->maxHp + 20;
     p->hp = p->maxHp;
-    printf("Max health increased by %d, Fully healed %d / %d\n", p->maxHp,
+    printf("Max health increased to %d, Fully healed %d / %d\n", p->maxHp,
            p->hp, p->maxHp);
     printf("-------------------------------\n");
   }
 }
 
 void restRestore(Player *p) {
-  if (p->hp != 100 && p->gold >= 20) {
+  if (p->hp != p->maxHp && p->gold >= 20) {
     printf("Using 20 Gold to restore Health. Current HP %d / %d", p->hp,
            p->maxHp);
     p->gold = p->gold - 20;
@@ -47,11 +56,11 @@ void showPlayerState(Player *p) {
   printf("Health: %d / %d\n", p->hp,
          p->maxHp); // I want to write every printf myself;
   printf("Gold: %d\n", p->gold);
-  printf("Portions: %d\n", p->portions);
+  printf("Health Portions: %d\n", p->portions);
   printf("Weapons: %d\n", p->weapon);
   printf("Pet: %d\n", p->hasPet);
   printf("Experience: %d\n", p->experience);
-  printf("Lever: %d\n", p->level);
+  printf("Level: %d\n", p->level);
   printf("-----------------------------\n");
 };
 
@@ -90,7 +99,6 @@ void enterDungeon(Player *p) {
   case 1:
     if (p->weapon > 0) {
       int monsterHealth = 100;
-      int choice;
       while (choice != 3 && monsterHealth > 0 && p->hp > 0) {
         printf("Monster Health: %d\n", monsterHealth);
         int damage = 30;
