@@ -1,6 +1,121 @@
 #include <stdio.h>
 FILE *file;
 
+void enterDungeon(int *hp, int *gold, int *portions, int hasKatana) {
+  int choice;
+  printf("Entered The Dungeon.\n");
+  printf("You have %d Health, %d Gold, %d Healing Portions, %d Katana\n", *hp,
+         *gold, *portions, hasKatana);
+  printf("1. To Fight with Monster\n");
+  printf("2. Exit the Dungeon.\n");
+  scanf("%d", &choice);
+
+  switch (choice) {
+  case 1:
+    if (hasKatana > 0) {
+      int monsterHealth = 100;
+      while (monsterHealth > 0) {
+        printf("Monster Health: %d\n", monsterHealth);
+        int damage = 30;
+        int monsterDamage = 10;
+        int choice;
+
+        printf("1. To Attack Monster with Katana\n");
+        printf("2. To Drink Portion\n");
+        printf("3. To Exit\n");
+        scanf("%d", &choice);
+
+        switch (choice) {
+        case 1:
+          printf("You did %d Damage to Monster\n", damage);
+          monsterHealth = monsterHealth - damage;
+          if (monsterHealth < 0) {
+            printf("Monster Health: 0\n");
+            *gold = *gold + 50;
+            printf("You killed the Monster and Earned 50 Gold Coins(Total "
+                   "Gold: %d)\n",
+                   *gold);
+          } else {
+            printf("Monster Health: %d\n", monsterHealth);
+            printf("Monster Did %d Damage to You\n", monsterDamage);
+            *hp = *hp - monsterDamage;
+            printf("Your Health: %d\n", *hp);
+          }
+
+          break;
+
+        case 2:
+          if (*portions > 0 && *hp < 100) {
+            printf("Drinking Portion");
+
+            *portions = *portions - 1;
+            printf("Health Increased by 30\n");
+
+            break;
+          } else {
+            printf("You have no Portion\n");
+            break;
+          }
+
+        case 3:
+          printf("Exiting the Fight (cause 20 golds)");
+          *gold = *gold - 20;
+          break;
+        }
+
+        if (*hp == 0) {
+          printf("Game Over\n");
+          break;
+        }
+      }
+    } else {
+      printf("You don't have any weapon to Attack.");
+    }
+
+    break;
+  case 2:
+    printf("Exiting Dungeon.\n");
+    break;
+  }
+}
+
+void printShowMenu(int gold, int portionPrice, int daggerPrice, int katanaPrice,
+                   int petPrice) {
+  printf("Current Balance: %d\n", gold);
+  printf("1. Katana (Cost: %d)\n", katanaPrice);
+  printf("2. Dagger (Cost: %d)\n", daggerPrice);
+  printf("3. Health Potion (Cost: %d)\n", portionPrice);
+  printf("4. Pet (Cost: %d)\n", petPrice);
+  printf("5. Enter Dungeon\n");
+  printf("6. To Exit\n");
+};
+
+void saveGame(int gold, int hp, int portion, int hasKatana) {
+  file = fopen("save.txt", "w");
+  if (file != NULL) {
+    fprintf(file, "%d %d %d %d\n", gold, hp, portion, hasKatana);
+    fclose(file);
+    printf("Progress Saved");
+  } else {
+    printf("File Can't be Saved!");
+  }
+}
+
+void loadGame(int *gold, int *hp, int *portion, int *hasKatana) {
+  file = fopen("save.txt", "r");
+  if (file != NULL) {
+    fscanf(file, "%d %d %d %d", gold, hp, portion, hasKatana);
+    printf("Game Loaded Successful\n");
+    fclose(file);
+  } else {
+    *gold = 10;
+    *hp = 100;
+    *portion = 0;
+    *hasKatana = 0;
+    printf("New game has started\n");
+  }
+}
+
 int main() {
   int gold;
   int hp;
@@ -15,20 +130,7 @@ int main() {
   int choice;
 
   {
-    file = fopen("save.txt", "r");
-    if (file != NULL) {
-      fscanf(file, "%d %d %d %d", &gold, &hp, &portions, &hasKatana);
-      fclose(file);
-      printf("Loaded Game Successful with Current Balance of %d. Hp: %d, "
-             "Portions: %d, hasKatana: %d\n",
-             gold, hp, portions, hasKatana);
-    } else {
-      gold = 120;
-      hp = 100;
-      portions = 0;
-      hasKatana = 0;
-      printf("New Game Started. Balance: %d\n", gold);
-    }
+    loadGame(&gold, &hp, &portions, &hasKatana);
   }
 
   printf("You arrive at the Outpost Merchant.\n");
@@ -40,14 +142,10 @@ int main() {
     while (choice != 5) {
       printf("You can Buy: \n");
       {
-        printf("Current Balance: %d\n", gold);
-        printf("1. Katana (Cost: %d)\n", katanaPrice);
-        printf("3. Dagger (Cost: %d)\n", daggerPrice);
-        printf("2. Health Potion (Cost: %d)\n", portionPrice);
-        printf("4. Pet (Cost: %d)\n", petPrice);
+        printShowMenu(gold, portionPrice, daggerPrice, katanaPrice, petPrice);
       };
 
-      printf("Enter Option (1,2,3,4): ");
+      printf("Enter Option (1,2,3,4,5): ");
       scanf("%d", &choice);
       if (choice == 1) {
         if (gold >= katanaPrice) {
@@ -83,29 +181,16 @@ int main() {
           printf("You don't have enough Gold Coins to buy a Pet\n");
         }
       } else if (choice == 5) {
+        enterDungeon(&hp, &gold, &portions, hasKatana);
+      } else if (choice == 6) {
         printf("Have a Good Day! You exit the Shop\n");
         printf("Avaliable Gold Coin: %d\n", gold);
-        file = fopen("save.txt", "w");
-        fprintf(file, "%d %d %d %d\n", gold, hp, portions, hasKatana);
-        fclose(file);
-        printf("Progress Saved");
+        saveGame(gold, hp, portions, hasKatana);
       } else {
         printf("Invalid Choice.\n");
       }
     }
-  }
-
-  //   if (gold >= portionPrice) {
-  //     gold = gold - portionPrice;
-  //     printf("Health Postion (-%d) Bought!\n", portionPrice);
-  //     printf("Balance %d Gold Coins\n", gold);
-  //     portions++;
-  //   } else {
-  //     int needed = portionPrice - gold;
-  //     printf(
-  //         "You need %d Gold Coin more to buy a Health Portion. (Av. Balance:
-  //         %d " "Gold Coin)", needed, gold);
-  //   };
+  };
 
   return 0;
 };
