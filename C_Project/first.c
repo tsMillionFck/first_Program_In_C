@@ -12,6 +12,20 @@ typedef struct {
   int level;
 } Player;
 
+void restRestore(Player *p) {
+  if (p->hp != 100 && p->gold >= 20) {
+    printf("Using 20 Gold to restore Health. Current HP %d / %d", p->hp,
+           p->maxHp);
+    p->gold = p->gold - 20;
+    p->hp = p->maxHp;
+    printf("Restore Health to Fullest. %d / %d", p->hp, p->maxHp);
+  } else {
+    printf("Either you are short on Gold %d (Required 20), or have full Health "
+           "%d / %d",
+           p->gold, p->hp, p->maxHp);
+  }
+}
+
 void showPlayerState(Player *p) {
   printf("-----------------------------\n");
   printf("Health: %d / %d\n", p->hp,
@@ -199,7 +213,8 @@ void home(Player *p) {
     printf("Enter Merchant Shop (Option 1)\n");
     printf("Enter Dungeon (Option 2)\n");
     printf("Check Stats (Option 3)\n");
-    printf("Exit Game (Option 4)\n");
+    printf("Rest to Restore Health\n");
+    printf("Exit Game (Option 5)\n");
     printf("-----------------------------\n");
     printf("Enter Option: ");
 
@@ -216,6 +231,9 @@ void home(Player *p) {
       showPlayerState(p);
       break;
     case 4:
+      restRestore(p);
+      break;
+    case 5:
       printf("Saving and leaving the game. Goodbye.\n");
       saveGame(p);
       break;
