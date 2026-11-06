@@ -1,5 +1,6 @@
 #ifndef MONSTER_H
 #define MONSTER_H
+#include "./player.h"
 
 typedef enum {
   ABILITY_NONE = 0,
@@ -18,5 +19,7 @@ typedef struct {
   int goldReward;
   MonsterAbility ability;
 } Monster;
+
+Monster createTroll();
 
 #endif
