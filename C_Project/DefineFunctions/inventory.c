@@ -3,7 +3,7 @@
 
 int addWeaponToBag(Player *p, int weaponId) {
   if (p->bagCount == MAX_BAG) {
-    printf("You can't add items to inventory, the inventory is full.");
+    printf("You can't add items to inventory, the inventory is full.\n");
     return 0;
   }
 
@@ -21,23 +21,45 @@ const char *getWeaponName(int weaponId) { // why did we convert this function to
   case 1:
     return "Dagger";
     break;
-  case 3:
+  case 2:
     return "Katana";
     break;
+
+  default:
+    printf("%d", weaponId);
+    return "Unknown";
   }
 } // why is this showing probility of error
 
 void displayInventory(const Player *p) {
-  for (int i = 0; i < p->bagCount - 1; i++) {
-    printf("%s", getWeaponName(p->inverntory[i]));
+  printf("---------Inventory------------\n");
+  for (int i = 0; i < p->bagCount; i++) {
+    printf("\t%d:\t %s\n", i, getWeaponName(p->inverntory[i]));
   }
+  printf("--------------------------------\n");
 }
 
 void equiqWeaponFromBag(Player *p) {
-  short int choice;
-  printf("-----------------------------------");
-  printf("Select weapon from inventory: ");
+  int choice;
+  printf("-----------------------------------\n");
+  printf("Select weapon from inventory: \n");
   scanf("%d", &choice);
-  printf("-----------------------------------");
+  printf("-----------------------------------\n");
   p->equippedWeapon = choice;
+}
+
+int calculatePlayerDamage(const Player *p) {
+  switch (p->equippedWeapon) {
+  case 0:
+    return 10;
+    break;
+  case 1:
+    return 20;
+    break;
+  case 2:
+    return 30;
+    break;
+  default:
+    return 0;
+  }
 }

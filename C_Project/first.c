@@ -1,26 +1,6 @@
-#include "Header/player.h"
+#include "./Header/player.h"
 #include <stdio.h>
 FILE *file;
-
-typedef struct {
-  int hp;
-  int maxHp;
-  int gold;
-  int portions;
-  int weapon;
-  int hasPet;
-  int experience;
-  int level;
-} Player;
-
-typedef struct {
-  char name[30];
-  int hp;
-  int maxHp;
-  int attack;
-  int expReward;
-  int goldReward;
-} Monster;
 
 void checkLevelUp(Player *p) {
   int baseCount = 100;
@@ -58,7 +38,9 @@ void showPlayerState(Player *p) {
          p->maxHp); // I want to write every printf myself;
   printf("Gold: %d\n", p->gold);
   printf("Health Portions: %d\n", p->portions);
-  printf("Weapons: %d\n", p->weapon);
+  printf("-----Weapons-----");
+  displayInventory(p);
+  printf("-----------------");
   printf("Pet: %d\n", p->hasPet);
   printf("Experience: %d\n", p->experience);
   printf("Level: %d\n", p->level);
@@ -78,8 +60,15 @@ void printShowMenu(int gold, int portionPrice, int daggerPrice, int katanaPrice,
 void saveGame(const Player *p) {
   file = fopen("save.txt", "w");
   if (file != NULL) {
-    fprintf(file, "%d %d %d %d %d %d %d %d\n", p->gold, p->hp, p->maxHp,
-            p->portions, p->weapon, p->hasPet, p->experience, p->level);
+    fprintf(file, "%d %d %d %d %d %d %d %d %d\n", p->gold, p->hp, p->maxHp,
+            p->portions, p->equippedWeapon, p->hasPet, p->experience, p->level,
+            p->bagCount);
+
+    for (int i = 0; i < MAX_BAG; i++) {
+      fprintf(file, "%d ", p->inverntory[i]);
+    }
+
+    fprintf(file, "\n");
     fclose(file);
     printf("Progress Saved");
   } else {
@@ -90,85 +79,101 @@ void saveGame(const Player *p) {
 void enterDungeon(Player *p) {
   int choice;
   printf("Entered The Dungeon.\n");
-  printf("You have %d Health, %d Gold, %d Healing Portions, %d Katana\n", p->hp,
-         p->gold, p->portions, p->weapon);
+  printf("You have %d Health, %d Gold, %d Healing Portions, %s weapon\n", p->hp,
+         p->gold, p->portions, getWeaponName(p->equippedWeapon));
   printf("1. To Fight with Monster\n");
   printf("2. Exit the Dungeon.\n");
   scanf("%d", &choice);
+  int monsterHealth = 100;
 
   switch (choice) {
   case 1:
-    if (p->weapon > 0) {
-      int monsterHealth = 100;
-      while (choice != 3 && monsterHealth > 0 && p->hp > 0) {
-        printf("Monster Health: %d\n", monsterHealth);
-        int damage = 30;
-        int monsterDamage = 10;
+    while (choice != 4 && monsterHealth > 0 && p->hp > 0) {
+      printf("Monster Health: %d\n", monsterHealth);
+      int damage = calculatePlayerDamage(p);
+      int monsterDamage = 10;
 
-        printf("1. To Attack Monster with Katana\n");
-        printf("2. To Drink Portion\n");
-        printf("3. To Exit\n");
-        scanf("%d", &choice);
+      printf("1. To Attack Monster with %s\n",
+             getWeaponName(p->equippedWeapon));
+      printf("2. Open Weapon Inventory\n");
+      printf("3. To Drink Portion\n");
+      printf("4. To Exit\n");
+      scanf("%d", &choice);
 
-        switch (choice) {
-        case 1:
-          printf("You did %d Damage to Monster\n", damage);
-          monsterHealth = monsterHealth - damage;
-          if (monsterHealth < 0) {
-            printf("Monster Health: 0\n");
-            p->gold = p->gold + 50;
-            printf("You killed the Monster and Earned 50 Gold Coins(Total "
-                   "Gold: %d)\n",
-                   p->gold);
-            p->experience = p->experience + 90;
-            printf("Experienced Increased to %d \n ", p->experience);
-            checkLevelUp(p);
-          } else {
-            printf("Monster Health: %d\n", monsterHealth);
-            printf("Monster Did %d Damage to You\n", monsterDamage);
-            p->hp = p->hp - monsterDamage;
-            printf("Your Health: %d\n", p->hp);
+      switch (choice) {
+      case 1:
+        printf("You did %d Damage to Monster\n", damage);
+        monsterHealth = monsterHealth - damage;
+        if (monsterHealth <= 0) {
+          printf("Monster Health: 0\n");
+          p->gold = p->gold + 50;
+          printf("You killed the Monster and Earned 50 Gold Coins(Total "
+                 "Gold: %d)\n",
+                 p->gold);
+          p->experience = p->experience + 90;
+          printf("Experienced Increased to %d \n ", p->experience);
+          checkLevelUp(p);
+        } else {
+          printf("Monster Health: %d\n", monsterHealth);
+          printf("Monster Did %d Damage to You\n", monsterDamage);
+          p->hp = p->hp - monsterDamage;
+          printf("Your Health: %d\n", p->hp);
+        }
+
+        break;
+
+      case 2: {
+        int choice = 0;
+        displayInventory(p);
+        while (choice != 2) {
+          printf("1. Change Weapon. (Option 1)\n");
+          printf("2. Return to Battle (Option 2)\n");
+          printf("Select Option: ");
+          scanf("%d", &choice);
+
+          if (choice == 1) {
+            equiqWeaponFromBag(p);
           }
+        }
+      } break;
+
+      case 3:
+        if (p->portions > 0 && p->hp < 100) {
+          printf("Drinking Portion");
+
+          p->portions = p->portions - 1;
+          printf("Health Increased by 30\n");
 
           break;
-
-        case 2:
-          if (p->portions > 0 && p->hp < 100) {
-            printf("Drinking Portion");
-
-            p->portions = p->portions - 1;
-            printf("Health Increased by 30\n");
-
-            break;
-          } else if (p->hp == 100) {
-            printf("Your Health is Full");
-            break;
-          } else {
-            printf("You have no Portion\n");
-            break;
-          }
-
-        case 3:
-          printf("Exiting the Fight (cause 20 golds)");
-          p->gold = p->gold - 20;
+        } else if (p->hp == 100) {
+          printf("Your Health is Full");
+          break;
+        } else {
+          printf("You have no Portion\n");
           break;
         }
 
-        if (p->hp == 0) {
-          if (p->experience > 30) {
-            p->experience = p->experience - 30;
-            p->level = p->level - 1;
-          } else {
-            p->experience = 0;
-            p->level = 0;
-            p->gold = p->gold - 10;
-          }
-          printf("Game Over\n");
-          break;
-        }
+      case 4:
+        printf("Exiting the Fight (cause 20 golds)");
+        p->gold = p->gold - 20;
+        break;
       }
-    } else {
-      printf("You don't have any weapon to Attack.");
+
+      if (p->hp == 0) {
+        if (p->experience > 30) {
+          p->experience = p->experience - 30;
+          p->level = p->level - 1;
+        } else {
+          p->experience = 0;
+          p->level = 0;
+          p->gold = p->gold - 10;
+        }
+        printf("Game Over\n");
+        break;
+      }
+
+    default:
+      printf("Invalid Choice try Again");
     }
 
     break;
@@ -199,7 +204,10 @@ void enterMerchantShop(Player *p) {
         p->gold = p->gold - katanaPrice;
         printf("You Bought a Katana (-%d) (Avl. Balance: %d)\n", katanaPrice,
                p->gold);
-        p->weapon = 1;
+        addWeaponToBag(p, WEAPON_KATANA);
+        if (p->equippedWeapon == 0) {
+          p->equippedWeapon = WEAPON_KATANA;
+        }
       } else {
         printf("You don't have enough Gold Coins to buy a Katana\n");
       }
@@ -208,6 +216,10 @@ void enterMerchantShop(Player *p) {
         p->gold = p->gold - daggerPrice;
         printf("You Bought a Dagger (-%d) (Avl. Balance: %d)\n", daggerPrice,
                p->gold);
+        addWeaponToBag(p, WEAPON_DAGGER);
+        if (p->equippedWeapon == 0) {
+          p->equippedWeapon = WEAPON_DAGGER;
+        }
       } else {
         printf("You don't have enough Gold Coins to buy a Dagger\n");
       }
@@ -244,13 +256,13 @@ void home(Player *p) {
 
   while (choice != 5) {
     printf("You arrive at a safe house\n");
-    printf("You have %d Health, %d Gold, %d Healing Portions, %d Katana\n",
-           p->hp, p->gold, p->portions, p->weapon);
+    printf("You have %d Health, %d Gold, %d Healing Portions, %s Weapon\n",
+           p->hp, p->gold, p->portions, getWeaponName(p->equippedWeapon));
     printf("-----------------------------\n");
     printf("Enter Merchant Shop (Option 1)\n");
     printf("Enter Dungeon (Option 2)\n");
     printf("Check Stats (Option 3)\n");
-    printf("Rest to Restore Health\n");
+    printf("Rest to Restore Health (Option 4)\n");
     printf("Exit Game (Option 5)\n");
     printf("-----------------------------\n");
     printf("Enter Option: ");
@@ -284,8 +296,13 @@ void home(Player *p) {
 void loadGame(Player *p) {
   file = fopen("save.txt", "r");
   if (file != NULL) {
-    fscanf(file, "%d %d %d %d %d %d %d %d\n", &p->gold, &p->hp, &p->maxHp,
-           &p->portions, &p->weapon, &p->hasPet, &p->experience, &p->level);
+    fscanf(file, "%d %d %d %d %d %d %d %d %d\n", &p->gold, &p->hp, &p->maxHp,
+           &p->portions, &p->equippedWeapon, &p->hasPet, &p->experience,
+           &p->level, &p->bagCount);
+
+    for (int i = 0; i < MAX_BAG; i++) {
+      fscanf(file, "%d", &p->inverntory[i]);
+    }
     printf("Game Loaded Successful\n");
     fclose(file);
   } else {
@@ -296,12 +313,18 @@ void loadGame(Player *p) {
     p->hasPet = 0;
     p->experience = 0;
     p->level = 0;
+    p->bagCount = 0;
+    p->equippedWeapon = 0;
+
+    for (int i = 0; i < MAX_BAG; i++) {
+      p->inverntory[i] = 0;
+    }
     printf("New game has started\n");
   }
 }
 
 int main() {
-  Player player;
+  Player player = {0};
 
   loadGame(&player);
 
