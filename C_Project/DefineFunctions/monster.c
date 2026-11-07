@@ -81,6 +81,31 @@ void triggeMonsterAbility(Monster *m, Player *p) {
       m->ability = getRandomAbility();
     }
     break;
+  case ABILITY_TIME_CONTROL: {
+    int roll = rand() * 100;
+    if (roll < 25 && m->hp > 0 && p->hp > 0) {
+      printf("\n%s whisper: You dare challenge the time.....");
+      printf("TIME HAS FROZEN! You can't move");
+
+      int accumateDamage = 0;
+      int hitCount = 0;
+
+      while (accumateDamage < 30 && p->hp > 0) {
+        int strike = 10;
+        p->hp -= strike;
+        accumateDamage += strike;
+        if (p->hp <= 0) {
+          printf("%s whisper: Let yourself be consumed by the time....",
+                 m->name);
+          printf("You died");
+          break;
+        }
+        hitCount++;
+        printf("Time Flows again");
+      }
+    }
+  } break;
+
   default:
     break;
   }
