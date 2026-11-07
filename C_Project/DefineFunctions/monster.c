@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 Monster createTroll() {
   Monster troll;
@@ -33,9 +34,16 @@ const char *getMonsterAbilityName(MonsterAbility a) {
   case 4:
     return "Second Phase (Enrage)";
     break;
+  default:
+    return "Error in ability";
+    break;
   }
 }
 
+MonsterAbility getRandomAbility() {
+  int roll = (rand() % 3) + 1;
+  return (MonsterAbility)roll;
+}
 void triggeMonsterAbility(Monster *m, Player *p) {
   switch (m->ability) {
   case ABILITY_REGENERATION:
@@ -59,6 +67,18 @@ void triggeMonsterAbility(Monster *m, Player *p) {
     if (p->hp <= 0) {
       printf("You died due to %s posion!\n", m->name);
       p->hp = 0;
+    }
+    break;
+  case ABILITY_SECOND_PHASE:
+    if (m->hp <= 10) {
+      printf("%s: OH Death become my blade once more.\n", m->name);
+      printf("%s is in Second Phase\n", m->name);
+      m->maxHp = 300;
+      m->hp = 300;
+      m->attack = 50;
+      m->expReward = 500;
+      m->goldReward = 500;
+      m->ability = getRandomAbility();
     }
     break;
   default:
