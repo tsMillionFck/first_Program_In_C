@@ -15,8 +15,8 @@ typedef struct {
   int portions;
   int inverntory[MAX_BAG]; // used to set a limit to how much a player can
                            // carry. Kind of like a Slot system
-  int bagCount;       // to track how many itmes a player is carrying.
-  int equippedWeapon; // which weapon the player has equipped.
+  int bagCount;            // to track how many itmes a player is carrying.
+  int equippedWeapon;      // which weapon the player has equipped.
   int experience;
   int level;
   int hasPet;
@@ -24,5 +24,11 @@ typedef struct {
 
 int percentageChance(); // why do we use const in parameters of
                         // new player struct pointer
+
+int addWeaponToBag(Player *p, int weaponId);
+const char *getWeaponName(int weaponId);
+void displayInventory(const Player *p);
+void equiqWeaponFromBag(Player *p);
+int calculatePlayerDamage(const Player *p);
 
 #endif

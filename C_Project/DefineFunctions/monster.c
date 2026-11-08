@@ -120,25 +120,30 @@ void triggerMonsterAbility(Monster *m, Player *p) {
   case ABILITY_TIME_CONTROL: {
     int roll = rand() % 100;
     if (roll < 25 && m->hp > 0 && p->hp > 0) {
-      printf("\n%s whisper: You dare challenge the time.....", m->name);
-      printf("TIME HAS FROZEN! You can't move");
+      printf("\n%s whisper: You dare challenge the time.....\n", m->name);
+      printf("TIME HAS FROZEN! You can't move\n");
 
       int accumateDamage = 0;
       int hitCount = 0;
+
+      printf("---------------Dehold my Power------------------");
 
       while (accumateDamage < 30 && p->hp > 0) {
         int strike = 10;
         p->hp -= strike;
         accumateDamage += strike;
         if (p->hp <= 0) {
-          printf("%s whisper: Let yourself be consumed by the time....",
+          printf("%s whisper: Let yourself be consumed by the time....\n",
                  m->name);
-          printf("You died");
+          printf("You died\n");
           break;
         }
         hitCount++;
+        printf("CHRONO IS DOIND %d Damage\n", strike);
       }
       printf("\nTime Flows again\n");
+
+      printf("--------------------------------------");
     }
   } break;
 
@@ -151,19 +156,30 @@ Monster getRandomMonster() {
   int diceValue = rand() % 4;
   switch (diceValue) {
   case 0:
-    createTroll();
+    return createTroll();
     break;
   case 1:
-    createViper();
+    return createViper();
     break;
   case 2:
-    createChronoTheTime();
+    return createChronoTheTime();
     break;
   case 3:
-    createTheSunKing();
+    return createTheSunKing();
     break;
   default:
-    createTroll();
+    return createTroll();
     break;
   }
+}
+
+void monsterDisplay(const Monster *m) {
+  printf("------------------------------\n");
+  printf("Monster Name: %s\n", m->name);
+  printf("Monster %d / %d (HP/maxHP)\n", m->hp, m->maxHp);
+  printf("Monster ExpReware: %d\n", m->expReward);
+  printf("Gold Reward after killing the %s, GOLD: %d\n", m->name,
+         m->goldReward);
+  printf("Ability of Monster: %s\n", getMonsterAbilityName(m->ability));
+  printf("------------------------------\n");
 }

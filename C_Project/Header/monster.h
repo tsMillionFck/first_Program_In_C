@@ -29,5 +29,6 @@ MonsterAbility getRandomAbility();
 Monster getRandomMonster();
 const char *getMonsterAbilityName(MonsterAbility a);
 void triggerMonsterAbility(Monster *m, Player *p);
+void monsterDisplay(const Monster *m);
 
 #endif

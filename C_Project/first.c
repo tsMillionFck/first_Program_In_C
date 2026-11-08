@@ -1,6 +1,8 @@
 #include "./Header/monster.h"
 #include "./Header/player.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 FILE *file;
 
 void checkLevelUp(Player *p) {
@@ -91,7 +93,7 @@ void enterDungeon(Player *p) {
 
   switch (choice) {
   case 1:
-    while (choice != 4 && monster.hp >= 0 && p->hp >= 0) {
+    while (choice != 4 && monster.hp > 0 && p->hp > 0) {
       printf("%s has appearded in dungeon, He has the ability of %s, Kill him "
              "to get Gold: %d & Exp: %d]\n",
              monster.name, getMonsterAbilityName((monster.ability)),
@@ -125,8 +127,22 @@ void enterDungeon(Player *p) {
           checkLevelUp(p);
         } else {
           printf("Monster Health: %d\n", monster.hp);
-          printf("Monster Did %d Damage to You\n", monsterDamage);
           p->hp = p->hp - monsterDamage;
+          printf("Monster Did %d Damage to You\n", monsterDamage);
+
+          if (p->hp <= 0) {
+            printf("You Died");
+            break;
+          };
+          int chanceOfAbility = rand() % 2;
+          if (chanceOfAbility == 1) {
+            triggerMonsterAbility(&monster, p);
+          }
+
+          if (p->hp <= 0) {
+            printf("You Died");
+            break;
+          }
           printf("Your Health: %d\n", p->hp);
         }
 
@@ -189,6 +205,7 @@ void enterDungeon(Player *p) {
     break;
   case 2:
     printf("--UPCOMING MONSTER--\n");
+    monsterDisplay(&monster);
     break;
   case 3:
     printf("Exiting Dungeon.\n");
@@ -209,6 +226,11 @@ void enterMerchantShop(Player *p) {
   while (choice != 5) {
     printf("You can Buy: \n");
     printShowMenu(p->gold, portionPrice, daggerPrice, katanaPrice, petPrice);
+
+    if (p->bagCount >= MAX_BAG) {
+      printf("Bag is full cannot Buy more weapons");
+      break;
+    }
 
     printf("Enter Option (1,2,3,4,5): ");
     scanf("%d", &choice);
@@ -337,6 +359,7 @@ void loadGame(Player *p) {
 }
 
 int main() {
+  srand(time(NULL));
   Player player = {0};
 
   loadGame(&player);
