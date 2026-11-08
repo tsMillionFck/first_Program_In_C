@@ -22,6 +22,9 @@ typedef struct {
 } Monster;
 
 Monster createTroll();
+Monster createViper();
+Monster createChronoTheTime();
+Monster createTheSunKing();
 MonsterAbility getRandomAbility();
 Monster getRandomMonster();
 const char *getMonsterAbilityName(MonsterAbility a);

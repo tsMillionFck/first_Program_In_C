@@ -86,18 +86,22 @@ void enterDungeon(Player *p) {
   printf("3. To see upcoming Monster.\n");
   printf("-------------------------------\n");
   scanf("%d", &choice);
-  Monster troll = createTroll();
-  printf("Monster Name: %s\n", troll.name);
+  Monster monster = getRandomMonster();
+  printf("Monster Name: %s\n", monster.name);
 
   switch (choice) {
   case 1:
-    while (choice != 4 && troll.hp >= 0 && p->hp >= 0) {
+    while (choice != 4 && monster.hp >= 0 && p->hp >= 0) {
+      printf("%s has appearded in dungeon, He has the ability of %s, Kill him "
+             "to get Gold: %d & Exp: %d]\n",
+             monster.name, getMonsterAbilityName((monster.ability)),
+             monster.goldReward, monster.expReward);
       int damage = calculatePlayerDamage(p);
-      int monsterDamage = troll.attack;
+      int monsterDamage = monster.attack;
 
       printf("-----------Stats-------------\n");
       printf("Player Health: %d / %d\n", p->hp, p->maxHp);
-      printf("Monster Health: %d / %d\n", troll.hp, troll.maxHp);
+      printf("Monster Health: %d / %d\n", monster.hp, monster.maxHp);
       printf("-----------Actions-----------\n");
       printf("1. To Attack Monster with %s\n",
              getWeaponName(p->equippedWeapon));
@@ -109,18 +113,18 @@ void enterDungeon(Player *p) {
       switch (choice) {
       case 1:
         printf("You did %d Damage to Monster\n", damage);
-        troll.hp = troll.hp - damage;
-        if (troll.hp <= 0) {
+        monster.hp = monster.hp - damage;
+        if (monster.hp <= 0) {
           printf("Monster Health: 0\n");
-          p->gold = p->gold + troll.goldReward;
+          p->gold = p->gold + monster.goldReward;
           printf("You killed the Monster and Earned %d Gold Coins(Total "
                  "Gold: %d)\n",
-                 troll.goldReward, p->gold);
-          p->experience = p->experience + troll.expReward;
+                 monster.goldReward, p->gold);
+          p->experience = p->experience + monster.expReward;
           printf("Experienced Increased to %d \n ", p->experience);
           checkLevelUp(p);
         } else {
-          printf("Monster Health: %d\n", troll.hp);
+          printf("Monster Health: %d\n", monster.hp);
           printf("Monster Did %d Damage to You\n", monsterDamage);
           p->hp = p->hp - monsterDamage;
           printf("Your Health: %d\n", p->hp);
@@ -185,15 +189,6 @@ void enterDungeon(Player *p) {
     break;
   case 2:
     printf("--UPCOMING MONSTER--\n");
-    Monster troll2 = createTroll();
-    printf("Name\t:\t %s\n", troll2.name);
-    printf("Hp\t:\t %d\n", troll2.hp);
-    printf("maxHp\t:\t %d\n", troll2.maxHp);
-    printf("Attack\t:\t %d\n", troll2.attack);
-    printf("ExpReward\t:\t %d\n", troll2.expReward);
-    printf("GoldReward\t:\t %d\n", troll2.goldReward);
-    printf("Ability\t:\t %d\n", troll2.ability);
-    printf("-----------------------");
     break;
   case 3:
     printf("Exiting Dungeon.\n");
