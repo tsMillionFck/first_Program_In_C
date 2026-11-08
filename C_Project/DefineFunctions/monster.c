@@ -17,6 +17,42 @@ Monster createTroll() {
   return troll; // Troll monster creator
 }
 
+Monster createViper() {
+  Monster viper;
+  strcpy(viper.name, "Rich Viper");
+  viper.hp = 120;
+  viper.maxHp = 120;
+  viper.attack = 20;
+  viper.expReward = 60;
+  viper.goldReward = 100;
+  viper.ability = ABILITY_POISON;
+  return viper;
+}
+
+Monster createChronoTheTime() {
+  Monster chrono;
+  strcpy(chrono.name, "Chrono The Time");
+  chrono.hp = 200;
+  chrono.maxHp = 200;
+  chrono.attack = 35;
+  chrono.expReward = 100;
+  chrono.goldReward = 40;
+  chrono.ability = ABILITY_TIME_CONTROL;
+  return chrono;
+}
+
+Monster createTheSunKing() {
+  Monster sunKing;
+  strcpy(sunKing.name, "Sun King, Sukuna");
+  sunKing.hp = 500;
+  sunKing.maxHp = 500;
+  sunKing.attack = 50;
+  sunKing.expReward = 1000;
+  sunKing.goldReward = 1000;
+  sunKing.ability = ABILITY_SECOND_PHASE;
+  return sunKing;
+}
+
 const char *getMonsterAbilityName(MonsterAbility a) {
   switch (a) {
   case 0:
@@ -102,7 +138,7 @@ void triggerMonsterAbility(Monster *m, Player *p) {
         }
         hitCount++;
       }
-      printf("Time Flows again");
+      printf("\nTime Flows again\n");
     }
   } break;
 
@@ -112,10 +148,22 @@ void triggerMonsterAbility(Monster *m, Player *p) {
 }
 
 Monster getRandomMonster() {
-  int diceValue = rand() % 2;
-  if (diceValue == 0) {
-    return createTroll();
-  } else {
-    return createTroll();
+  int diceValue = rand() % 4;
+  switch (diceValue) {
+  case 0:
+    createTroll();
+    break;
+  case 1:
+    createViper();
+    break;
+  case 2:
+    createChronoTheTime();
+    break;
+  case 3:
+    createTheSunKing();
+    break;
+  default:
+    createTroll();
+    break;
   }
 }
