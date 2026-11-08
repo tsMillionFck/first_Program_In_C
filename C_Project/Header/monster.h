@@ -4,10 +4,11 @@
 
 typedef enum {
   ABILITY_NONE = 0,
-  ABILITY_POISON,
-  ABILITY_REGENERATION,
-  ABILITY_TIME_CONTROL,
-  ABILITY_SECOND_PHASE
+  ABILITY_POISON = 1,
+  ABILITY_REGENERATION = 2,
+  ABILITY_TIME_CONTROL = 3,
+  ABILITY_SECOND_PHASE = 4,
+  ABILITY_COUNT
 } MonsterAbility;
 
 typedef struct {
@@ -21,5 +22,9 @@ typedef struct {
 } Monster;
 
 Monster createTroll();
+MonsterAbility getRandomAbility();
+Monster getRandomMonster();
+const char *getMonsterAbilityName(MonsterAbility a);
+void triggerMonsterAbility(Monster *m, Player *p);
 
 #endif

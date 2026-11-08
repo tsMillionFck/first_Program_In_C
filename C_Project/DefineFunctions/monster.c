@@ -44,7 +44,7 @@ MonsterAbility getRandomAbility() {
   int roll = (rand() % 3) + 1;
   return (MonsterAbility)roll;
 }
-void triggeMonsterAbility(Monster *m, Player *p) {
+void triggerMonsterAbility(Monster *m, Player *p) {
   switch (m->ability) {
   case ABILITY_REGENERATION:
     if (m->hp < m->maxHp && m->hp > 0) {
@@ -82,9 +82,9 @@ void triggeMonsterAbility(Monster *m, Player *p) {
     }
     break;
   case ABILITY_TIME_CONTROL: {
-    int roll = rand() * 100;
+    int roll = rand() % 100;
     if (roll < 25 && m->hp > 0 && p->hp > 0) {
-      printf("\n%s whisper: You dare challenge the time.....");
+      printf("\n%s whisper: You dare challenge the time.....", m->name);
       printf("TIME HAS FROZEN! You can't move");
 
       int accumateDamage = 0;
@@ -101,8 +101,8 @@ void triggeMonsterAbility(Monster *m, Player *p) {
           break;
         }
         hitCount++;
-        printf("Time Flows again");
       }
+      printf("Time Flows again");
     }
   } break;
 
@@ -111,7 +111,7 @@ void triggeMonsterAbility(Monster *m, Player *p) {
   }
 }
 
-Monster getRandomMonster(int playerLevel) {
+Monster getRandomMonster() {
   int diceValue = rand() % 2;
   if (diceValue == 0) {
     return createTroll();
