@@ -1,4 +1,5 @@
 #include "../Header/weapon.h"
+#include "stdio.h"
 #include <string.h>
 
 Weapon createDagger() {
@@ -27,7 +28,7 @@ Weapon createKatana() {
   w.durability = 50;
   w.maxDurability = 50;
   strcpy(w.weaponTier, "Common");
-  w.ability = WEAPON_ABILITY_NONE;
+  w.ability = WEAPON_ABILITY_LIFESTEAL;
   return w;
 }
 
@@ -60,4 +61,54 @@ Weapon createOmegaKatana() {
   w.ability = WEAPON_ABILITY_OMEGA_SLASH;
   return w;
 }
-// here we define those functions
+
+Weapon getWeaponById(int id) {
+  switch (id) {
+  case 1:
+    return createDagger();
+    break;
+  case 2:
+    return createKatana();
+    break;
+  case 3:
+    return createTimeSlayer();
+    break;
+  case 4:
+    return createOmegaKatana();
+    break;
+  default:
+    printf("Error in getting weapon");
+    break;
+  }
+}
+
+const char *getWeaponAbilityName(WeaponAbility a) {
+  switch (a) {
+  case WEAPON_ABILITY_NONE:
+    return "NONE";
+    break;
+  case WEAPON_ABILITY_FIRE:
+    return "Fire";
+    break;
+  case WEAPON_ABILITY_TIME_SLAYER:
+    return "Time Slayer";
+    break;
+  case WEAPON_ABILITY_LIFESTEAL:
+    return "Lifesteal";
+    break;
+  case WEAPON_ABILITY_OMEGA_SLASH:
+    return "Omega Slash";
+    break;
+  }
+}
+
+void weaponSTAT(Weapon *w) {
+  printf("Name: %s\n", w->name);
+  printf("Attack Damage: %d\n", w->attackDamage);
+  printf("Crit Chance: %d\n", w->critChance);
+  printf("Exp Boost: %d\n", w->expBoost);
+  printf("Durability: %d/%d\n", w->durability, w->maxDurability);
+  printf("Weapon Tier: %s\n", w->weaponTier);
+  printf("Ability: %s\n", getWeaponAbilityName(w->ability));
+}
+// here we define those functions;
