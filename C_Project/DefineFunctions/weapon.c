@@ -1,5 +1,6 @@
 #include "../Header/weapon.h"
 #include "stdio.h"
+#include "stdlib.h"
 #include <string.h>
 
 Weapon createDagger() {
@@ -8,7 +9,7 @@ Weapon createDagger() {
   strcpy(w.name, "DAGGER");
   w.attackDamage = 10;
   w.price = 10;
-  w.critChance = 25;
+  w.critChance = 30;
   w.expBoost = 0;
   w.durability = 20;
   w.maxDurability = 20;
@@ -99,6 +100,32 @@ const char *getWeaponAbilityName(WeaponAbility a) {
   case WEAPON_ABILITY_OMEGA_SLASH:
     return "Omega Slash";
     break;
+  }
+}
+
+int executeWeaponAttack(const Weapon *w, Player *p, Monster *m) {
+  int totalDamage = w->attackDamage;
+  if (rand() % 100 < w->critChance) {
+    m->hp -= w->attackDamage * 2;
+    printf("Critical HIT was done to %s (using weapon: %s with 2x Damage: %d)",
+           m->name, w->name, w->attackDamage * 2);
+  }
+  m->hp -= w->attackDamage;
+
+  switch (w->ability) {
+  case WEAPON_ABILITY_FIRE: {
+    int burnDamage = 15;
+    totalDamage += burnDamage;
+    printf("Fire damage was done to %s (Using ability: Fire) of %d", m->name,
+           totalDamage);
+  } break;
+  case WEAPON_ABILITY_LIFESTEAL: {
+    int healAmount = totalDamage / 3;
+    p->hp += healAmount;
+    if (p->hp > p->maxHp) {
+      p->hp = p->maxHp;
+    }
+  }
   }
 }
 
